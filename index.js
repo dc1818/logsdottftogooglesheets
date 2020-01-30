@@ -4,6 +4,7 @@ const port = process.env.port || 3000;
 const fs = require('fs');
 const readline = require('readline');
 const {google} = require('googleapis');
+app.use(express.static('public'));
 var sheets = google.sheets('v4');
 
 // If modifying these scopes, delete token.json.
