@@ -19,6 +19,7 @@ body{
 {
   position:relative;
   width:50%;
+  font-size:40px;
   margin:auto;
   text-align:center;
   background-color:pink;
@@ -26,8 +27,26 @@ body{
 #matchweek
 {
   position:relative;
+  font-size:40px;
   width:50%;
   margin:auto;
   text-align:center;
   background-color:pink;
+}
+#logs
+{
+  position:relative;
+  width:50%;
+  font-size:40px;
+  margin:auto;
+  text-align:center;
+  background-color:pink;
+}
+#submit
+{
+  position:relative;
+  width:50%;
+  margin:auto;
+  text-align:center;
+
 }

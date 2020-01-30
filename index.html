@@ -10,7 +10,7 @@
     <h1>LOGS.TF WEEKLY STATS TO GOOGLE SHEETS</h1>
     </div>
 
-    <form>
+    <form name = "form">
       <div id ="teamnames">
         Select your team
 
@@ -25,12 +25,35 @@
 
         </div>
         <div id = "matchweek">
-          
+          Select match week number
+          <select name = "week">
+            <option value = "1">1</option>
+            <option value = "2">2</option>
+            <option value = "3">3</option>
+            <option value = "4">4</option>
+            <option value = "5">5</option>
+            <option value = "6">6</option>
+            <option value = "7">7</option>
+            <option value = "8">8</option>
+          </select>
+        </div>
+        <div id = "logs">
+            Enter URL for combined log of match for the week
+            <input type="url" name="logspage">
           </div>
+          <div id = "submit">
+            <button onClick = "submitForm()">Submit</button>
+            </div>
+          </form>
 
+          <script type = "text/javascript">
+            function submitForm()
+            {
+              console.log("submitform");
+            document.form.submit();
+            }
+          </script>
 
-
-      </form>
 
 
 

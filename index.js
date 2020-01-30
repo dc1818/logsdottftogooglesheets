@@ -6,6 +6,12 @@ const readline = require('readline');
 const {google} = require('googleapis');
 app.use(express.static('public'));
 var sheets = google.sheets('v4');
+var bodyParser = require('body-parser')
+app.use( bodyParser.json() );       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+    extended: true
+}));
+
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly',"https://www.googleapis.com/auth/drive","https://www.googleapis.com/auth/drive.file","https://www.googleapis.com/auth/spreadsheets"];
@@ -56,7 +62,8 @@ function getNewToken(oAuth2Client, callback) {
     input: process.stdin,
     output: process.stdout,
   });
-  rl.question('Enter the code from that page here: ', (code) => {
+  rl.question('Enter the code from that page here: ', (code) =>
+  {
     rl.close();
     oAuth2Client.getToken(code, (err, token) => {
       if (err) return console.error('Error while trying to retrieve access token', err);
@@ -100,11 +107,7 @@ function test(oAuth2Client)
     ]
   ]
 },
-
-
-
-
-   auth: oAuth2Client,
+  auth: oAuth2Client,
  };
 
  sheets.spreadsheets.values.append(request, function(err, response) {
@@ -125,8 +128,11 @@ function test(oAuth2Client)
 app.get('/',function(req,res)
 {
    res.sendFile('index.html', {root: __dirname })
+});
 
-
+app.post('/:teamName/:weekNumber/:url',function(req,res)
+{
+  console.log(req.params.teamName);
 });
 
 
