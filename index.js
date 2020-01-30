@@ -21,12 +21,7 @@ const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly',"https:/
 // time.
 const TOKEN_PATH = 'token.json';
 
-// Load client secrets from a local file.
-fs.readFile('credentials.json', (err, content) => {
-  if (err) return console.log('Error loading client secret file:', err);
-  // Authorize a client with credentials, then call the Google Sheets API.
-  authorize(JSON.parse(content), test);
-});
+
 
 /**
  * Create an OAuth2 client with the given credentials, and then execute the
@@ -121,11 +116,14 @@ function test(oAuth2Client)
    // TODO: Change code below to process the `response` object:
    console.log(JSON.stringify(response, null, 2));
  });
+}
 
-
-
+function getLogsHTML()
+{
 
 }
+
+
 
 app.get('/',function(req,res)
 {
@@ -133,11 +131,32 @@ app.get('/',function(req,res)
 });
 
 //app.post('/:teamName/:weekNumber/:url',function(req,res)
-app.post('/formsubmit',function(req,res)
+app.post('/formSubmit',function(req,res)
 {
   console.log("form submit");
   console.log(req.body);
+
+
+
+
+
+  // Load client secrets from a local file.
+  fs.readFile('credentials.json', (err, content) => {
+    if (err) return console.log('Error loading client secret file:', err);
+    // Authorize a client with credentials, then call the Google Sheets API.
+    authorize(JSON.parse(content), test);
+  });
+
+
+
+
   res.send(req.body);
+
+
+
+
+
+
 
 });
 
