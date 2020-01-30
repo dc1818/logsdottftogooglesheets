@@ -42,16 +42,35 @@
             <input type="url" name="logspage">
           </div>
           <div id = "submit">
-            <button onClick = "submitForm()">Submit</button>
+            <button id = "submitbutton" type="button">Submit</button>
             </div>
           </form>
 
           <script type = "text/javascript">
-            function submitForm()
-            {
-              console.log("submitform");
-            document.form.submit();
-            }
+            let team;
+            let week;
+            let url;
+
+            var submitForm = function ()
+              {
+
+                console.log("submitform");
+                  fetch('/formsubmit', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                    team: teamname.value,
+                    week: week.value,
+                    url:logs.value
+                  });
+                });
+              }
+
+
+
+              document.getElementById("submitbutton").addEventListener("click", submitform);
           </script>
 
 

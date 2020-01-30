@@ -6,6 +6,7 @@ const readline = require('readline');
 const {google} = require('googleapis');
 app.use(express.static('public'));
 var sheets = google.sheets('v4');
+
 var bodyParser = require('body-parser')
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -39,7 +40,8 @@ function authorize(credentials, callback) {
       client_id, client_secret, redirect_uris[0]);
 
   // Check if we have previously stored a token.
-  fs.readFile(TOKEN_PATH, (err, token) => {
+  fs.readFile(TOKEN_PATH, (err, token) =>
+  {
     if (err) return getNewToken(oAuth2Client, callback);
     oAuth2Client.setCredentials(JSON.parse(token));
     callback(oAuth2Client);
@@ -80,7 +82,7 @@ function getNewToken(oAuth2Client, callback) {
 
 function test(oAuth2Client)
 {
-  console.log("yes");
+  console.log("add data to sheet");
 
   var request = {
    // The ID of the spreadsheet to update.
@@ -130,9 +132,13 @@ app.get('/',function(req,res)
    res.sendFile('index.html', {root: __dirname })
 });
 
-app.post('/:teamName/:weekNumber/:url',function(req,res)
+//app.post('/:teamName/:weekNumber/:url',function(req,res)
+app.post('/formsubmit',function(req,res)
 {
-  console.log(req.params.teamName);
+  console.log("form submit");
+  console.log(req.body);
+  res.send(req.body);
+
 });
 
 
