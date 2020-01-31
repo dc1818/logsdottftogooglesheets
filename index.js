@@ -1,16 +1,29 @@
 const express = require('express');
 const app = express();
+const rp = require('request-promise');
+const cheerio = require('cheerio');
 const port = process.env.port || 3000;
 const fs = require('fs');
 const readline = require('readline');
 const {google} = require('googleapis');
 let url;
+let dom;
+let $;
+let logName;
+let logMap;
+let logLength;
+let date;
+let blueScore;
+let redScore;
+let players;
+let dataTemplate = [];
 let htmlData;
-app.use(express.static('public'));
-const rp = require('request-promise');
-const $ = require('cheerio');
-
 var sheets = google.sheets('v4');
+
+app.use(express.static('public'));
+
+
+
 
 var bodyParser = require('body-parser')
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
@@ -128,14 +141,38 @@ function getLogsHTML(link)
   console.log("getlogshtmlfunction");
   rp(link)
   .then(function(html){
-    console.log(html);
+    //console.log(html);
     htmlData=html;
+
+    selectElementsFromDom(cheerio.load(htmlData));
+
+
+
+
+
+    console.log("\n\n\n\n\nHTML parsed");
+    console.log(htmlData.firstChild.structure);
   })
   .catch(function(err){
     //handle error
   });
 }
 
+function selectElementsFromDom($)
+{
+  console.log("select elements from dom");
+
+  logName = $('#log-name').text();
+  logMap = $('#log-map').text();
+  logLength = $('#log-length').text();
+  date = $('log-date').text();
+  blueScore = $('.pull-right').first().text();
+  redScore = $('.pull-left').eq(1).text();
+
+  players = $('[id^="player_"]').text();
+
+  console.log(players);
+}
 
 
 app.get('/',function(req,res)
