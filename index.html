@@ -2,6 +2,28 @@
 <head>
   <link rel = "stylesheet" type = "text/css" href = "index.css" />
 <title>RGL Weekly Stats-Logs.tf to Google Sheets</title>
+<script>function check_url(){
+    //Get input value
+    var elem = document.getElementById("url_input");
+    var input_value = elem.value;
+	//Set input value to lower case so HTTP or HtTp become http
+	input_value = input_value.toLowerCase();
+
+    //Check if string starts with http:// or https://
+    var regExr = /^(http:|https:)\/\/.*$/m;
+
+    //Test expression
+    var result = regExr.test(input_value);
+
+	//If http:// or https:// is not present add http:// before user input
+    if (!result){
+		var new_value = "http://"+input_value;
+		elem.value=new_value;
+    }
+}
+</script>
+
+
 </head>
 
 <body>
@@ -38,7 +60,7 @@
         </div>
         <div id = "logs">
             Enter URL for combined log of match for the week
-            <input type="url" name="logspage">
+            <input id = "url_input" type="url" name="logspage">
           </div>
           <div id = "submit">
             <button id = "submitbutton">Submit</button>

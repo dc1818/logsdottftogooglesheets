@@ -4,8 +4,11 @@ const port = process.env.port || 3000;
 const fs = require('fs');
 const readline = require('readline');
 const {google} = require('googleapis');
+let url;
+let htmlData;
 app.use(express.static('public'));
 const rp = require('request-promise');
+const $ = require('cheerio');
 
 var sheets = google.sheets('v4');
 
@@ -120,9 +123,17 @@ function test(oAuth2Client)
  });
 }
 
-function getLogsHTML()
+function getLogsHTML(link)
 {
-
+  console.log("getlogshtmlfunction");
+  rp(link)
+  .then(function(html){
+    console.log(html);
+    htmlData=html;
+  })
+  .catch(function(err){
+    //handle error
+  });
 }
 
 
@@ -136,7 +147,10 @@ app.get('/',function(req,res)
 app.post('/formSubmit',function(req,res)
 {
   console.log("form submit");
-  console.log(req.body);
+  //console.log(req.body);
+
+  url = req.body.logspage;
+  getLogsHTML(url);
 
 
 
