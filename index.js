@@ -169,9 +169,28 @@ function selectElementsFromDom($)
   blueScore = $('.pull-right').first().text();
   redScore = $('.pull-left').eq(1).text();
 
-  players = $('[id^="player_"]').text();
+  players = $('[id^="player_"]');
 
-  console.log(players);
+
+  for(i=0;i<players.length;i++)
+  {
+    console.log(`${i} + index and data: ${players[i]}`);
+    dataTemplate.push({
+      "id":players[i].attribs.id,
+      "teamname":players[i].children[1].children[0].data,
+      
+    });
+  }
+
+
+
+  //console.log(players[0]);
+
+  console.log(players[0].children[1].children[0].data);
+
+
+  res.send(players);
+
 }
 
 
@@ -203,7 +222,7 @@ app.post('/formSubmit',function(req,res)
 
 
 
-  res.send(req.body);
+
 
 
 
