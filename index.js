@@ -21,6 +21,7 @@ let values=[];
 let request=null;
 let dataTemplate =[];
 let dataTemplateArrays=[];
+let teamname;
 
 
 var sheets = google.sheets('v4');
@@ -233,7 +234,9 @@ function selectElementsFromDom(data)
         "backstabs":$('td:nth-child(14)')[i].children[0].data,
         "headshots":$('td:nth-child(15)')[i].children[0].data,
         "airshots":$('td:nth-child(16)')[i].children[0].data,
-        "capturepointcaptures":$('td:nth-child(17)')[i].children[0].data
+        "capturepointcaptures":$('td:nth-child(17)')[i].children[0].data,
+        "teamname":teamname,
+        "weeknumber":week
       });
       //console.log(dataTemplate);
 
@@ -255,7 +258,9 @@ function selectElementsFromDom(data)
       $('td:nth-child(14)')[i].children[0].data,
       $('td:nth-child(15)')[i].children[0].data,
       $('td:nth-child(16)')[i].children[0].data,
-      $('td:nth-child(17)')[i].children[0].data
+      $('td:nth-child(17)')[i].children[0].data,
+      teamname,
+      week
     ]);
 
 
@@ -285,7 +290,9 @@ app.post('/formSubmit',function(req,res)
 
 
   url = req.body.logspage;
-
+  teamname = req.body.teamname;
+  week = req.body.week;
+  console.log(req.body);
 
     getLogsHTML(url,function(htmlData)
     {
