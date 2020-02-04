@@ -18,6 +18,9 @@ let redScore;
 let players;
 let htmlData;
 let values=[];
+let request=null;
+let dataTemplate =[];
+let dataTemplateArrays=[];
 
 
 var sheets = google.sheets('v4');
@@ -96,7 +99,7 @@ function getNewToken(oAuth2Client, callback) {
   });
 }
 
-function appendToSheet(oAuth2Client,request)
+function appendToSheet(oAuth2Client)
 {
   request.auth = oAuth2Client;
   //console.log(request);
@@ -117,14 +120,16 @@ function appendToSheet(oAuth2Client,request)
    //console.log(JSON.stringify(response, null, 2));
  });
 }
-function createArrays(dataTemplate, callback)
+function createArrays()
 {
     console.log("create array");
+
+    console.log(JSON.stringify(dataTemplate[0].values));
   let keys=[];
   let arr =[];
   let name;
 
-  let request = {
+  request = {
    // The ID of the spreadsheet to update.
    spreadsheetId: '1usgRC4_OfsnViMrDI_coagrMp5QdXb3Kjllj4Iu6YZE',  // TODO: Update placeholder value.
 
@@ -149,27 +154,18 @@ function createArrays(dataTemplate, callback)
   auth:null
   };
 
+//console.log(request);
+//console.log(dataTemplate);
 
 
 
-dataTemplate.forEach(function(elem)
-{
-
-  keys.push(elem.values);
-  //console.log(keys);
-  //arr.push(keys);
-  arr.push(keys);
-});
-
-  console.log(dataTemplate);
-console.log(arr);
 
 
-  //request.resource["values"]=arr;
-  request.resource["values"]=arr;
+  //console.log(arr);
+  request.resource["values"]=dataTemplateArrays;
   //console.log(request.resource);
 
-  callback(request);
+
 }
 
 function getLogsHTML(link,callback)
@@ -195,14 +191,14 @@ function getLogsHTML(link,callback)
 
 }
 
-function selectElementsFromDom(data,callbacktwo)
+function selectElementsFromDom(data)
 {
 
     console.log("select elements from dom");
     //console.log(data);
     let $ = cheerio.load(data);
     //console.log($);
-    let dataTemplate =[];
+
 
     logName = $('#log-name').text();
     logMap = $('#log-map').text();
@@ -221,7 +217,7 @@ function selectElementsFromDom(data,callbacktwo)
 
       dataTemplate.push({
         "id":players[i].attribs.id,
-        "teamname":players[i].children[1].children[0].data,
+        "teamcolor":players[i].children[1].children[0].data,
         "playername":$('td.log-player-name > div > a')[i].children[0].data,
         "class":$('td.log-classes.classes > i')[i].attribs["data-title"],
         "kills":$('td:nth-child(4)')[i].children[0].data,
@@ -239,9 +235,29 @@ function selectElementsFromDom(data,callbacktwo)
         "airshots":$('td:nth-child(16)')[i].children[0].data,
         "capturepointcaptures":$('td:nth-child(17)')[i].children[0].data
       });
-      //console.log(dataTemplate[i]);
+      //console.log(dataTemplate);
 
-        callbacktwo(dataTemplate);
+      dataTemplateArrays.push([
+      players[i].attribs.id,
+      players[i].children[1].children[0].data,
+      $('td.log-player-name > div > a')[i].children[0].data,
+      $('td.log-classes.classes > i')[i].attribs["data-title"],
+      $('td:nth-child(4)')[i].children[0].data,
+      $('td:nth-child(5)')[i].children[0].data,
+      $('td:nth-child(6)')[i].children[0].data,
+      $('td:nth-child(7)')[i].children[0].data,
+      $('td:nth-child(8)')[i].children[0].data,
+      $('td:nth-child(9)')[i].children[0].data,
+      $('td:nth-child(10)')[i].children[0].data,
+      $('td:nth-child(11)')[i].children[0].data,
+      $('td:nth-child(12)')[i].children[0].data,
+      $('td:nth-child(13)')[i].children[0].data,
+      $('td:nth-child(14)')[i].children[0].data,
+      $('td:nth-child(15)')[i].children[0].data,
+      $('td:nth-child(16)')[i].children[0].data,
+      $('td:nth-child(17)')[i].children[0].data
+    ]);
+
 
 
 
@@ -251,7 +267,7 @@ function selectElementsFromDom(data,callbacktwo)
   //console.log(players[0]);
   //console.log(dataTemplate[i].playername);
   //console.log(players[0]);
-
+  console.log(dataTemplateArrays);
 //  res.send(players);
 }
 
@@ -270,14 +286,20 @@ app.post('/formSubmit',function(req,res)
 
   url = req.body.logspage;
 
-  if(url!=null)
-  {
+
     getLogsHTML(url,function(htmlData)
     {
       //console.log(html);
-      selectElementsFromDom(htmlData,function(data)
-    {
-        createArrays(data,function(reque)
+      selectElementsFromDom(htmlData);
+      createArrays();
+
+
+
+      if(request==null)
+      {
+        console.log("working");
+      }
+      else if(request!=null)
       {
         // Load client secrets from a local file.
         fs.readFile('credentials.json', (err, content) =>
@@ -285,15 +307,25 @@ app.post('/formSubmit',function(req,res)
           if (err) return console.log('Error loading client secret file:', err);
 
           // Authorize a client with credentials, then call the Google Sheets API.
-        authorize(JSON.parse(content), appendToSheet,reque);
+        authorize(JSON.parse(content), appendToSheet);
         });
 
 
 
-      });
-    })
+      }
+
+
+
+
     });
-  }
+
+
+
+
+
+
+
+
 
 
 
