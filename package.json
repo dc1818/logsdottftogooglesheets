@@ -1,0 +1,23 @@
+{
+  "name": "nodeserver",
+  "version": "1.0.0",
+  "description": "Parse logs from specifies logs website then send them to a google sheets raw data file",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dc1818/logsdottftogooglesheets.git"
+  },
+  "author": "dc_",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dc1818/logsdottftogooglesheets/issues"
+  },
+  "homepage": "https://github.com/dc1818/logsdottftogooglesheets#readme",
+  "dependencies": {
+    "nodemon": "^2.0.2"
+  }
+}

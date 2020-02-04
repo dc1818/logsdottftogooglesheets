@@ -8,7 +8,6 @@ const readline = require('readline');
 const {google} = require('googleapis');
 let url;
 let dom;
-let $;
 let logName;
 let names;
 let logMap;
@@ -17,7 +16,6 @@ let date;
 let blueScore;
 let redScore;
 let players;
-let dataTemplate = [];
 let htmlData;
 let values=[];
 
@@ -51,17 +49,18 @@ const TOKEN_PATH = 'token.json';
  * @param {Object} credentials The authorization client credentials.
  * @param {function} callback The callback to call with the authorized client.
  */
-async function authorize(credentials, callback) {
+function authorize(credentials, callback,req) {
   const {client_secret, client_id, redirect_uris} = credentials.installed;
   const oAuth2Client = new google.auth.OAuth2(
       client_id, client_secret, redirect_uris[0]);
-
+      //console.log(req);
+      auth = oAuth2Client;
   // Check if we have previously stored a token.
   fs.readFile(TOKEN_PATH, (err, token) =>
   {
     if (err) return getNewToken(oAuth2Client, callback);
     oAuth2Client.setCredentials(JSON.parse(token));
-    callback(oAuth2Client);
+    callback(oAuth2Client,req);
   });
 }
 
@@ -97,11 +96,33 @@ function getNewToken(oAuth2Client, callback) {
   });
 }
 
-async function appendToSheet(oAuth2Client)
+function appendToSheet(oAuth2Client,request)
 {
-
-
+  request.auth = oAuth2Client;
+  //console.log(request);
   console.log("add data to sheet");
+
+
+
+
+
+
+ sheets.spreadsheets.values.append(request, function(err, response) {
+   if (err) {
+     console.error(err);
+     return;
+   }
+
+   // TODO: Change code below to process the `response` object:
+   //console.log(JSON.stringify(response, null, 2));
+ });
+}
+function createArrays(dataTemplate, callback)
+{
+    console.log("create array");
+  let keys=[];
+  let arr =[];
+  let name;
 
   let request = {
    // The ID of the spreadsheet to update.
@@ -121,127 +142,117 @@ async function appendToSheet(oAuth2Client)
    // TODO: Add desired properties to the request body.
      {
        "majorDimension": "ROWS",
-
-
-
-  },
-  auth:oAuth2Client
-
+       "values":[
+         ["asdasd"]
+       ]
+     },
+  auth:null
   };
 
 
 
 
-
- sheets.spreadsheets.values.append(request, function(err, response) {
-   if (err) {
-     console.error(err);
-     return;
-   }
-
-   // TODO: Change code below to process the `response` object:
-   console.log(JSON.stringify(response, null, 2));
- });
-}
-async function createArrays()
-{
-    console.log("create array");
-  let keys=[];
-  let arr =[];
-  let name;
-
 dataTemplate.forEach(function(elem)
 {
 
   keys.push(elem.values);
-  console.log(keys);
+  //console.log(keys);
   //arr.push(keys);
   arr.push(keys);
 });
 
-
+  console.log(dataTemplate);
 console.log(arr);
 
 
   //request.resource["values"]=arr;
   request.resource["values"]=arr;
-  console.log(request.resource);
+  //console.log(request.resource);
+
+  callback(request);
 }
 
-async function getLogsHTML(link)
+function getLogsHTML(link,callback)
 {
   console.log("getlogshtmlfunction");
   rp(link)
   .then(function(html){
     //console.log(html);
-    htmlData=html;
+    //console.log(`\n\n\n\n\nHTML parsed: \n\n\n ${html}`);
+    //console.log(html);
+    callback(html);
 
 
 
-
-
-
-
-    console.log("\n\n\n\n\nHTML parsed");
-    console.log(htmlData.firstChild.structure);
+    //console.log(htmlData.firstChild.structure);
   })
   .catch(function(err){
     //handle error
+    console.log(err);
   });
+
+
+
 }
 
-async function selectElementsFromDom($)
+function selectElementsFromDom(data,callbacktwo)
 {
-  console.log("select elements from dom");
 
-  logName = $('#log-name').text();
-  logMap = $('#log-map').text();
-  logLength = $('#log-length').text();
-  date = $('log-date').text();
-  blueScore = $('.pull-right').first().text();
-  redScore = $('.pull-left').eq(1).text();
+    console.log("select elements from dom");
+    //console.log(data);
+    let $ = cheerio.load(data);
+    //console.log($);
+    let dataTemplate =[];
 
-  players = $('[id^="player_"]');
-  names = $('td.log-player-name > div > a')[0].children[0].data;
+    logName = $('#log-name').text();
+    logMap = $('#log-map').text();
+    logLength = $('#log-length').text();
+    date = $('log-date').text();
+    blueScore = $('.pull-right').first().text();
+    redScore = $('.pull-left').eq(1).text();
 
-  for(i=0;i<players.length;i++)
-  {
-    //console.log(`${i} + index and data: ${players[i]}`);
-    dataTemplate.push({
-      "id":players[i].attribs.id,
-      "teamname":players[i].children[1].children[0].data,
-      "playername":$('td.log-player-name > div > a')[i].children[0].data,
-      "class":$('td.log-classes.classes > i')[i].attribs["data-title"],
-      "kills":$('td:nth-child(4)')[i].children[0].data,
-      "assists":$('td:nth-child(5)')[i].children[0].data,
-      "deaths":$('td:nth-child(6)')[i].children[0].data,
-      "damage":$('td:nth-child(7)')[i].children[0].data,
-      "damageaminute":$('td:nth-child(8)')[i].children[0].data,
-      "killsassistperdeath":$('td:nth-child(9)')[i].children[0].data,
-      "killsperdeath":$('td:nth-child(10)')[i].children[0].data,
-      "damagetaken":$('td:nth-child(11)')[i].children[0].data,
-      "damagetakenaminute":$('td:nth-child(12)')[i].children[0].data,
-      "healthpacks":$('td:nth-child(13)')[i].children[0].data,
-      "backstabs":$('td:nth-child(14)')[i].children[0].data,
-      "headshots":$('td:nth-child(15)')[i].children[0].data,
-      "airshots":$('td:nth-child(16)')[i].children[0].data,
-      "capturepointcaptures":$('td:nth-child(17)')[i].children[0].data
+    players = $('[id^="player_"]');
+    names = $('td.log-player-name > div > a')[0].children[0].data;
+
+    for(i=0;i<players.length;i++)
+    {
+      //console.log(`${i} + index and data: ${players[i]}`);
 
 
-    });
-    //console.log(dataTemplate[i]);
-  }
+      dataTemplate.push({
+        "id":players[i].attribs.id,
+        "teamname":players[i].children[1].children[0].data,
+        "playername":$('td.log-player-name > div > a')[i].children[0].data,
+        "class":$('td.log-classes.classes > i')[i].attribs["data-title"],
+        "kills":$('td:nth-child(4)')[i].children[0].data,
+        "assists":$('td:nth-child(5)')[i].children[0].data,
+        "deaths":$('td:nth-child(6)')[i].children[0].data,
+        "damage":$('td:nth-child(7)')[i].children[0].data,
+        "damageaminute":$('td:nth-child(8)')[i].children[0].data,
+        "killsassistperdeath":$('td:nth-child(9)')[i].children[0].data,
+        "killsperdeath":$('td:nth-child(10)')[i].children[0].data,
+        "damagetaken":$('td:nth-child(11)')[i].children[0].data,
+        "damagetakenaminute":$('td:nth-child(12)')[i].children[0].data,
+        "healthpacks":$('td:nth-child(13)')[i].children[0].data,
+        "backstabs":$('td:nth-child(14)')[i].children[0].data,
+        "headshots":$('td:nth-child(15)')[i].children[0].data,
+        "airshots":$('td:nth-child(16)')[i].children[0].data,
+        "capturepointcaptures":$('td:nth-child(17)')[i].children[0].data
+      });
+      //console.log(dataTemplate[i]);
+
+        callbacktwo(dataTemplate);
 
 
+
+
+}
 
   //console.log(players[0]);
   //console.log(dataTemplate[i].playername);
   //console.log(players[0]);
 
-
-
 //  res.send(players);
-
 }
 
 
@@ -259,39 +270,30 @@ app.post('/formSubmit',function(req,res)
 
   url = req.body.logspage;
 
-
-
-
-
-
-  // Load client secrets from a local file.
-  fs.readFile('credentials.json', (err, content) => {
-    if (err) return console.log('Error loading client secret file:', err);
-    // Authorize a client with credentials, then call the Google Sheets API.
-    getLogsHTML(url).then(function(){
-      selectElementsFromDom(cheerio.load(htmlData));
-
-
-
-    }).then(function()
+  if(url!=null)
   {
-    createArrays();
+    getLogsHTML(url,function(htmlData)
+    {
+      //console.log(html);
+      selectElementsFromDom(htmlData,function(data)
+    {
+        createArrays(data,function(reque)
+      {
+        // Load client secrets from a local file.
+        fs.readFile('credentials.json', (err, content) =>
+        {
+          if (err) return console.log('Error loading client secret file:', err);
+
+          // Authorize a client with credentials, then call the Google Sheets API.
+        authorize(JSON.parse(content), appendToSheet,reque);
+        });
 
 
-  }).then(function()
-  {
-    authorize(JSON.parse(content), appendToSheet);
-  }).catch(function()
-  {
-    console.log("no data found");
-  });
 
-
-
-
-  });
-
-
+      });
+    })
+    });
+  }
 
 
 
